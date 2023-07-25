@@ -1,0 +1,13 @@
+<view class="intro">
+    <view>
+        网络质量: {{networkQualityType}}
+    </view>
+    <view>
+        网络状态: {{networkType}}
+    </view>
+    <button bindtap="a">获取网络质量</button>
+      <button bindtap="b">获取网络状态</button>
+
+        <button bindtap="c">扫码</button>
+        <view>扫码结果:{{scanResult}}</view>
+</view>
