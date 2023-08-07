@@ -7,6 +7,15 @@ const app_id = 'cli_a4324e02edf9500d'
 const app_secret = 'KXuK9MuYvkfPIRlubWPWLgNCCPCdDtqM'
 
 
+const randomString = (e) => {
+  e = e || 32
+  let t = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678',
+    a = t.length,
+    n = ''
+  for (let i = 0; i < e; i++) n += t.charAt(Math.floor(Math.random() * a))
+  return n
+}
+
 router.prefix('/feishu')
 
 router.get('/', function* (next) {
@@ -36,11 +45,11 @@ router.get('/tenant/token', function* (next) {
     }
   )
   let timestamp = new Date().getTime()
-  let nonceStr = 'Y7a8KkqX041bsSwT'
+  // let nonceStr = 'Y7a8KkqX041bsSwT'
+  let nonceStr = randomString(16)
 
   let verifyStr = `jsapi_ticket=${result.data.data.ticket}=&noncestr=${nonceStr}&timestamp=${timestamp}&url=${url}`
   console.log('verifyStr',verifyStr);
-
   let hash = crypto.createHash('sha1')
   hash.update(verifyStr)
   let signature = hash.digest('hex')

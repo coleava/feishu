@@ -26,7 +26,7 @@ class TransportLayer {
   }
 
   async getTicket(){
-    let url = location.href.split('#')[0]
+    let url = encodeURIComponent(location.href.split('#')[0])
     let result = await this.client.get(`/tenant/token?url=${url}`);
     return result.data
   }

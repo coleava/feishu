@@ -5,15 +5,18 @@ import TransportLayer from './resquest'
 function App() {
   let [networkQualityType, setNetworkQualityType] = useState('')
   let [networkType, setNetworkType] = useState('')
+  let [n,setN] = useState(0)
+
   useEffect(() => {
-    if (window.h5sdk) {
+    if (window.h5sdk && n === 0) {
       TransportLayer.getTicket().then((res) => {
+        setN(1)
         window.h5sdk.config({
           appId: res.appId,
           timestamp: res.timestamp,
           nonceStr: res.nonceStr,
           signature: res.signature,
-          jsApiList: ['tt.getSystemInfo', 'tt.getNetworkType', 'tt.getScreenBrightness','tt.scanCode'],
+          jsApiList: ['tt.getSystemInfo', 'tt.getNetworkType', 'tt.getScreenBrightness', 'tt.scanCode'],
           // jsApiList: [],
           //鉴权成功回调
           onSuccess: (res) => {
@@ -27,6 +30,18 @@ function App() {
           },
         })
         window.h5sdk.ready(() => {
+          tt.getUserInfo({
+            // getUserInfo API 调用成功回调
+            success(res) {
+              console.log(`getUserInfo success: ${JSON.stringify(res)}`)
+              // 单独定义的函数showUser，用于将用户信息展示在前端页面上
+              showUser(res.userInfo)
+            },
+            // getUserInfo API 调用失败回调
+            fail(err) {
+              console.log(`getUserInfo failed, err:`, JSON.stringify(err))
+            },
+          })
           tt.getNetworkType({
             success(res) {
               setNetworkType(res.networkType)
