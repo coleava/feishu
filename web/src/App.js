@@ -5,10 +5,11 @@ import TransportLayer from './resquest'
 function App() {
   let [networkQualityType, setNetworkQualityType] = useState('')
   let [networkType, setNetworkType] = useState('')
-  let [n,setN] = useState(0)
+  let [n, setN] = useState(0)
+  let [scanResult, setScanResult] = useState('')
 
   useEffect(() => {
-    if (window.h5sdk && n === 0) {
+    if (window.h5sdk) {
       TransportLayer.getTicket().then((res) => {
         setN(1)
         window.h5sdk.config({
@@ -16,7 +17,7 @@ function App() {
           timestamp: res.timestamp,
           nonceStr: res.nonceStr,
           signature: res.signature,
-          jsApiList: ['tt.getSystemInfo', 'tt.getNetworkType', 'tt.getScreenBrightness', 'tt.scanCode'],
+          jsApiList: ['tt.getSystemInfo', 'tt.getNetworkType', 'tt.getScreenBrightness', 'tt.scanCode', 'tt.startBeaconDiscovery'],
           // jsApiList: [],
           //鉴权成功回调
           onSuccess: (res) => {
@@ -35,7 +36,7 @@ function App() {
             success(res) {
               console.log(`getUserInfo success: ${JSON.stringify(res)}`)
               // 单独定义的函数showUser，用于将用户信息展示在前端页面上
-              showUser(res.userInfo)
+              // showUser(res.userInfo)
             },
             // getUserInfo API 调用失败回调
             fail(err) {
@@ -51,53 +52,70 @@ function App() {
             },
           })
 
-          // tt.getScreenBrightness({
-          //   success(res) {
-          //     console.log('getScreenBrightness', JSON.stringify(res))
-          //   },
-          //   fail(res) {
-          //     console.log(`getScreenBrightness fail: ${JSON.stringify(res)}`)
-          //   },
-          // })
-
-          // tt.showModal({
-          //   title: '提示',
-          //   content: '当前飞书版本过低，无法使用该功能，请升级到最新飞书版本后重试。'
-          // })
-          tt.scanCode({
-            // barCodeInput: true,
+          tt.startLocationUpdate({
+            type: 'gcj02',
             success(res) {
-              console.log(JSON.stringify(res))
+              console.log('startLocationUpdate', JSON.stringify(res))
+              tt.startBeaconDiscovery({
+                uuids: ['FDA50693-A4E2-4FB1-AFCF-C6EB07647825'],
+                // ignoreBluetoothAvailable: true,
+                success(res) {
+              
+                },
+                fail(res) {
+                  console.log(`startBeaconDiscovery fail: ${JSON.stringify(res)}`)
+                },
+              })
+              tt.getBeacons({
+                success(res) {
+                  console.log('beacon', JSON.stringify(res))
+                },
+                fail(res) {
+                  console.log(`getBeacons fail: ${JSON.stringify(res)}`)
+                },
+              })
+            },
+            fail(res) {
+              console.log(`startLocationUpdate fail: ${JSON.stringify(res)}`)
+            },
+          })
+
+          tt.scanCode({
+            barCodeInput: true,
+            success(res) {
+              setScanResult(res.result)
+              console.log('scan',JSON.stringify(res))
             },
             fail(res) {
               console.log(`scanCode fail: ${JSON.stringify(res)}`)
             },
           })
-          // tt.getNetworkQualityType({
-          //   success(res) {
-          //     console.log(44444);
-          //     setNetworkQualityType(res.networkQualityType)
-          //     // console.log(JSON.stringify(res));
-          //   },
-          //   fail(res) {
-          //     console.log(66666);
-          //     console.log(`getNetworkQualityType fail: ${JSON.stringify(res)}`)
-          //   },
-          // })
-          // // console.log(window.tt.onNetworkQualityChange)
-          // tt.onNetworkQualityChange((res) => {
-          //   console.log('rerere', res)
-          //   setNetworkQualityType(res.networkQualityType)
-          // })
+
+          tt.getNetworkQualityType({
+            success(res) {
+              setNetworkQualityType(res.networkQualityType)
+              // console.log(JSON.stringify(res));
+            },
+            fail(res) {
+              console.log(`getNetworkQualityType fail: ${JSON.stringify(res)}`)
+            },
+          })
+          // console.log(window.tt.onNetworkQualityChange)
+          tt.onNetworkQualityChange((res) => {
+            console.log('rerere', res)
+            setNetworkQualityType(res.networkQualityType)
+          })
         })
       })
     }
   }, [])
+
   //
   return (
     <div className="App">
       <div>状态:{networkType}</div>
       <div>质量:{networkQualityType}</div>
+      <div>扫码结果:{scanResult}</div>
     </div>
   )
 }

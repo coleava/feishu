@@ -5,7 +5,7 @@ Page({
     status: '',
     scanResult:""
   },
-  a() {
+  networkQualityType() {
     let _this = this
     tt.getNetworkQualityType({
       success(res) {
@@ -17,7 +17,7 @@ Page({
       }
     });
   },
-  b() {
+  networkType() {
     let _this = this
     tt.getNetworkType({
       success(res) {
@@ -30,7 +30,7 @@ Page({
       }
     });
   },
-  c() {
+  scanCode() {
     let _this = this
     tt.scanCode({
       scanType: [
@@ -54,28 +54,27 @@ Page({
   },
   onShow: function () {
     let _this = this
-    // tt.scanCode({
-    //   scanType: [
-    //     "barCode",
-    //     "qrCode",
-    //     "datamatrix",
-    //     "pdf417"
-    //   ],
-    //   barCodeInput: true,
-    //   success(res) {
-    //     console.log(JSON.stringify(res));
-    //   },
-    //   fail(res) {
-    //     console.log(`scanCode fail: ${JSON.stringify(res)}`);
-    //   }
-    // });
+    tt.scanCode({
+      scanType: [
+        "barCode",
+        "qrCode",
+        "datamatrix",
+        "pdf417"
+      ],
+      barCodeInput: true,
+      success(res) {
+        console.log(JSON.stringify(res));
+      },
+      fail(res) {
+        console.log(`scanCode fail: ${JSON.stringify(res)}`);
+      }
+    });
     tt.onNetworkStatusChange(function (res) {
       _this.setData({ status: res.networkType })
       console.log(JSON.stringify(res));
     });
 
     tt.onNetworkQualityChange(function (res) {
-      console.log(1111, JSON.stringify(res));
       _this.setData({ networkQualityType: res.networkQualityType })
 
     });
